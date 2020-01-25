@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% load i18n static %}
+
+	<title>Login V1</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->	
+	<link rel="icon" type="image/png" href="{% static 'todo/images/icons/favicon.ico' %}"/>
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'todo/vendor/bootstrap/css/bootstrap.min.css' %}">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'todo/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'todo/vendor/animate/animate.css' %}">
+<!--===============================================================================================-->	
+	<link rel="stylesheet" type="text/css" href="{% static 'todo/vendor/css-hamburgers/hamburgers.min.css' %}">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'todo/vendor/select2/select2.min.css' %}">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'todo/css/util.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'todo/css/home.css' %}">
+<!--===============================================================================================-->
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="#">ToDo</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    	<span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      	<ul class="navbar-nav ml-auto">
+        	<li class="nav-item active">
+          		<a class="nav-link" href="#">Logout</a>
+        	</li>
+       		<li class="nav-item">
+          		<a class="nav-link" href="#">{{ username }}</a>
+        	</li>
+      	</ul>
+    </div>
+</nav>
+<div class="container task-container" style="margin-top: 10px;">
+	<div class="row">
+		<div class="col-md-12 col-sm-12">
+			<span class="task-head">Tasks</span>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12 col-sm-12">
+			<a href="/" class="add_task"><img src="{% static 'todo/images/icons/plus.png' %}"/><span class="tasks">Add Task</span></a>
+			<input type="checkbox"> <input type="text" class="input">
+		</div>
+	</div>
+</div>
+<!--===============================================================================================-->	
+<script src="{% static 'todo/vendor/jquery/jquery-3.2.1.min.js' %}"></script>
+<!--===============================================================================================-->
+	<script src="{% static 'todo/vendor/bootstrap/js/popper.js' %}"></script>
+	<script src="{% static 'todo/vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+<!--===============================================================================================-->
+	<script src="{% static 'todo/vendor/select2/select2.min.js' %}"></script>
+<!--===============================================================================================-->
+	<script src="{% static 'todo/vendor/tilt/tilt.jquery.min.js' %}"></script>
+	<script >
+		$('.js-tilt').tilt({
+			scale: 1.1
+		})
+	</script>
+	<script>
+	$('.add_task').on('click',function(event){
+		event.preventDefault();
+		alert("hello");
+	});
+	</script>
+<!--===============================================================================================-->
+	<script src="{% static 'todo/js/main.js' %}"></script>
+
+</body>
+</html>

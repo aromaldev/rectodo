@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+.navbar{
+    background-color:#346fef;
+    
+}
+body,html{
+    background:#E8E8E8;
+    min-height: 100% !important;
+    font-family: 'Open Sans';
+}
+.task-container{
+    background-color: #FFFFFF;
+    border-radius: 5px;
+    height: 100vh !important;
+}
+.task-head{
+    color:#346fef;
+    font-weight: bold;
+}
+.task-container .row{
+    padding:1em 1.5em;
+    border-bottom: 1px solid #E8E8E8;
+}
+.task-container .row:first-child{
+    padding: 1.5em;
+}
+.tasks{
+    color: #1c76c5;
+    margin-left: 1em;
+}
+a:active,a:hover{
+    text-decoration: none;
+}
+a{
+    outline: 0;
+}
+input{
+    border: none;
+}
