@@ -22,4 +22,5 @@ urlpatterns = [
     path('verify',views.verifyCredentials,name='verify'),
     path('logout',views.logout,name='logout'),
     path('addtask',views.addTask,name='addtask'),
+    path('complete',views.completeTask,name='complete'),
 ]

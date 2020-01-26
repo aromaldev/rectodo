@@ -37,3 +37,10 @@ def logout(request):
     del request.session['name']
     del request.session['id']
     return redirect(reverse('todo:login'))
+
+def completeTask(request):
+    if(request.method=="POST"):
+        task=Task.objects.get(id=request.POST['id'])
+        task.completed=request.POST['status']
+        task.save()
+        return HttpResponse("success")
