@@ -11,7 +11,9 @@ body,html{
 .task-container{
     background-color: #FFFFFF;
     border-radius: 5px;
-    height: 100vh !important;
+    height: 80vh !important;
+    max-height: 80vh;
+    overflow-x: auto;
 }
 .task-head{
     color:#346fef;
@@ -36,4 +38,10 @@ a{
 }
 input{
     border: none;
+}
+.btn-container .row .col{
+    text-align: right;
+}
+.add-ico, .complete-task{
+    margin-right: 1em;
 }

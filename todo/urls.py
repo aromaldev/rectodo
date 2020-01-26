@@ -18,6 +18,8 @@ from django.urls import path
 from . import views
 app_name = 'todo'
 urlpatterns = [
-    path('',views.login),
+    path('',views.login,name='login'),
     path('verify',views.verifyCredentials,name='verify'),
+    path('logout',views.logout,name='logout'),
+    path('addtask',views.addTask,name='addtask'),
 ]
