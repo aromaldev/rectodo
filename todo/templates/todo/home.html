@@ -11,16 +11,11 @@
 <!--===============================================================================================-->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="{% static 'todo/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="{% static 'todo/vendor/animate/animate.css' %}">
-<!--===============================================================================================-->	
-	<link rel="stylesheet" type="text/css" href="{% static 'todo/vendor/css-hamburgers/hamburgers.min.css' %}">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="{% static 'todo/vendor/select2/select2.min.css' %}">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="{% static 'todo/css/util.css' %}">
-	<link rel="stylesheet" type="text/css" href="{% static 'todo/css/home.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'todo/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+	
+	<link rel="stylesheet" type="text/css" href="{% static 'todo/css/home.css' %}">	
+
 <!--===============================================================================================-->
 </head>
 <body>
@@ -58,14 +53,18 @@
 	
 	{% for t in tasks %}
 	<div class="row">
-		<div class="col-md-12 col-sm-12">			
+		<div class="col-md-12 col-sm-12">
 			{% ifequal t.completed 1 %}
 				<input type="checkbox" id="{{ t.id }}" class="complete-task" checked>
-				<span class="task-desc" style="text-decoration: line-through;">{{ t.task }}</span>
+				<span class="task-desc" style="text-decoration: line-through;" id="{{ t.tasktype }}{{ t.id }}">{{ t.task }}</span>
+				</a>
 			{% else %}
 				<input type="checkbox" id="{{ t.id }}" class="complete-task">
-				<span class="task-desc">{{ t.task }}</span>
-			{% endifequal %}					
+				<span class="task-desc" id="{{ t.tasktype }}{{ t.id }}">{{ t.task }}</span>
+			{% endifequal %}
+			{% ifequal t.tasktype 'todo' %}
+				<span class="badge badge-primary">todo</span>
+			{% endifequal %}
 		</div>
 	</div>	
 	{% endfor %}
@@ -76,23 +75,45 @@
 		</div>
 	</div> -->
 </div>
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+	  	<div class="modal-content">
+			<div class="modal-header">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+					  <li class="breadcrumb-item"><a href="#">Home</a></li>
+					  <li class="breadcrumb-item"><a href="#">Library</a></li>
+					  <li class="breadcrumb-item active" aria-current="page">Data</li>
+					</ol>
+				</nav>
+		 		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+		  		</button>
+			</div>
+			<div class="modal-body">
+				<div class="modal-btns">
+					<button class="btn btn-primary" id="modal-task-btn">Add Task</button>
+					<button class="btn btn-primary" id="modal-todo-btn">Add Todo</button>
+				</div>
+			</div>
+			<div class="modal-footer">
+		  		<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+		  		<button type="button" class="btn btn-primary">Save changes</button>
+			</div>
+	  	</div>
+	</div>
+</div>
 <!--===============================================================================================-->	
-<script src="{% static 'todo/vendor/jquery/jquery-3.2.1.min.js' %}"></script>
+	<script src="{% static 'todo/vendor/jquery/jquery-3.2.1.min.js' %}"></script>
 <!--===============================================================================================-->
 	<script src="{% static 'todo/vendor/bootstrap/js/popper.js' %}"></script>
 	<script src="{% static 'todo/vendor/bootstrap/js/bootstrap.min.js' %}"></script>
 <!--===============================================================================================-->
-	<script src="{% static 'todo/vendor/select2/select2.min.js' %}"></script>
-<!--===============================================================================================-->
-	<script src="{% static 'todo/vendor/tilt/tilt.jquery.min.js' %}"></script>
-	<script >
-		$('.js-tilt').tilt({
-			scale: 1.1
-		})
-	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+
 	<script>
 	add_task=false;
-	head_task=0
+	head_task=[]
 	$('.add_task').on('click',function(event){
 		event.preventDefault();
 		alert("hello");
@@ -110,11 +131,11 @@
 			$.ajax({
 				type: "POST",
 				url: "addtask",
-				data: {'task':task,'csrfmiddlewaretoken': '{{ csrf_token }}','head':head_task},
+				data: {'task':task,'csrfmiddlewaretoken': '{{ csrf_token }}','head':head_task,'tasktype':'task'},
 				success: function (response) {
 					add_task=false;
 					$('.task-in-row').remove();
-					$('.head-row').after('<div class=\"row\"><div class=\"col-md-12 col-sm-12\"><input type="checkbox" id="'+response+'" class="complete-task" >'+task+'</div></div>');	
+					$('.head-row').after('<div class=\"row\"><div class=\"col-md-12 col-sm-12\"><input type="checkbox" id="'+response+'" class="complete-task" ><span class=\"task-desc\" id=\"task'+response+'\">'+task+'</span></div></div>');	
 				}
 			});
 		}else{
@@ -154,7 +175,7 @@
 				url: "complete",
 				data: {
 					'id':id,
-					'status':0,
+					'status':0,					
 					'csrfmiddlewaretoken': '{{ csrf_token }}'
 				},
 				success: function (response) {
@@ -163,7 +184,79 @@
 			});
 		}
 	});
+	$('#todo-btn').click(function(){
+		if (add_task){
+			add_task=false;
+			$('.task-in-row').remove();						
+		}
+		$.confirm({
+			title: 'New ToDo',
+			theme: 'supervan',
+			closeIcon: true,
+			escapeKey: true,
+    		backgroundDismiss: true,
+			content: '' +
+			'<form action="" class="formName">' +
+			'<div class="form-group"><br>'  +
+			'<input type="text" placeholder="Enter todo name" class="name form-control" required />' +
+			'</div>' +
+			'</form>',
+			buttons: {
+				formSubmit: {
+					text: 'Submit',
+					btnClass: 'btn-blue',
+					action: function () {
+						var name = this.$content.find('.name').val();
+						if(name){
+							$.ajax({
+								type: "POST",
+								url: "addtask",
+								data: {'task':name,'csrfmiddlewaretoken': '{{ csrf_token }}','head':head_task,'tasktype':'todo'},
+								success: function (response) {
+									// $(this).remove();
+									
+									$('body .head-row').after('<div class=\"row\"><div class=\"col-md-12 col-sm-12\"><input type="checkbox" id="'+response+'" class="complete-task" ><span class=\"task-desc\" id=\"todo'+response+'\">'+name+'</span><span class="badge badge-primary">todo</span></div></div>');	
+								}
+							});
+						}
+					}
+				},
+				
+			},
+			onContentReady: function () {
+				// bind to events
+				var jc = this;
+				this.$content.find('form').on('submit', function (e) {
+					// if the user submits the form by pressing enter in the field.
+					e.preventDefault();
+					jc.$$formSubmit.trigger('click'); // reference the button and click it
+				});
+			}
+		});
+	});
+	$(document).on('click','.task-desc',function(){
+		ttype=$(this).prop('id');
+		// alert(ttype.slice(0,4));
+		if(ttype.slice(0,4)=='todo'){
+			tid=ttype.slice(4,ttype.length)
+			head_task.unshift(tid)
+			$.ajax({
+				type: "POST",
+				url: "fetchtodo",
+				data: {'id':tid,'csrfmiddlewaretoken': '{{ csrf_token }}'},
+				dataType : "JSON",
+				success: function (response) {
+					$.each(response, function (indexInArray, valueOfElement) { 
+						console.log(valueOfElement['fields']['task'])
+					});
+					$('.modal').modal('show');
+				}
+			});
+			
+		}
+	});
 	</script>
+	
 <!--===============================================================================================-->
 
 </body>

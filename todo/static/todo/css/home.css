@@ -45,3 +45,16 @@ input{
 .add-ico, .complete-task{
     margin-right: 1em;
 }
+.badge{
+    float: right;
+}
+.task-desc{
+    cursor: pointer;
+}
+.breadcrumb{
+    margin-bottom: 0px;
+    background:#fff;
+}
+.modal-btns{
+    text-align: right;
+}
