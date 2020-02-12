@@ -91,14 +91,14 @@
 		  		</button>
 			</div>
 			<div class="modal-body">
+				
+				
+			</div>
+			<div class="modal-footer">
 				<div class="modal-btns">
 					<button class="btn btn-primary" id="modal-task-btn">Add Task</button>
 					<button class="btn btn-primary" id="modal-todo-btn">Add Todo</button>
 				</div>
-			</div>
-			<div class="modal-footer">
-		  		<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-		  		<button type="button" class="btn btn-primary">Save changes</button>
 			</div>
 	  	</div>
 	</div>
@@ -113,7 +113,8 @@
 
 	<script>
 	add_task=false;
-	head_task=[]
+	head_task=[];
+	head_task_id=[];
 	$('.add_task').on('click',function(event){
 		event.preventDefault();
 		alert("hello");
@@ -122,6 +123,9 @@
 		if (!add_task){
 			add_task=true;
 			$('.head-row').after('<div class=\"row task-in-row\"><div class=\"col-md-12 col-sm-12\"><img src=\"{% static "todo/images/icons/plus.png" %}\" class=\"add-ico\"/><input type=\"text\" class=\"input task-in\" placeholder=\"Enter your task\"></div></div>');		
+		}else{
+			add_task=false;
+			$('.task-in-row').remove();
 		}
 	});
 	$(document).on('blur','.task-in',function(){
@@ -236,23 +240,76 @@
 	});
 	$(document).on('click','.task-desc',function(){
 		ttype=$(this).prop('id');
+		tname=$(this).text();
 		// alert(ttype.slice(0,4));
 		if(ttype.slice(0,4)=='todo'){
-			tid=ttype.slice(4,ttype.length)
-			head_task.unshift(tid)
+			tid=ttype.slice(4,ttype.length);
+			head_task_id.unshift(tid);
+			head_task.unshift(tname);
+			console.log(tid);
 			$.ajax({
 				type: "POST",
 				url: "fetchtodo",
 				data: {'id':tid,'csrfmiddlewaretoken': '{{ csrf_token }}'},
 				dataType : "JSON",
 				success: function (response) {
+					$('.modal-body').html('');
 					$.each(response, function (indexInArray, valueOfElement) { 
-						console.log(valueOfElement['fields']['task'])
+						if(valueOfElement['fields']['tasktype']=='todo'){
+							if(valueOfElement['fields']['completed']==1){
+								$('.modal-body').append('<div class=\"row\"><div class=\"col-md-12 col-sm-12\"><input type="checkbox" id="'+valueOfElement['pk']+'" class="complete-task" checked><span class=\"task-desc\" id=\"todo'+valueOfElement['pk']+'\" style=\"text-decoration:line-through\">'+valueOfElement['fields']['task']+'</span><span class="badge badge-primary">todo</span></div></div>');	
+							}
+							else{
+								$('.modal-body').append('<div class=\"row\"><div class=\"col-md-12 col-sm-12\"><input type="checkbox" id="'+valueOfElement['pk']+'" class="complete-task" ><span class=\"task-desc\" id=\"todo'+valueOfElement['pk']+'\">'+valueOfElement['fields']['task']+'</span><span class="badge badge-primary">todo</span></div></div>');	
+							}
+						}else{
+							if(valueOfElement['fields']['completed']==1){
+								$('.modal-body').append('<div class=\"row\"><div class=\"col-md-12 col-sm-12\"><input type="checkbox" id="'+valueOfElement['pk']+'" class="complete-task" checked><span class=\"task-desc\" id=\"todo'+valueOfElement['pk']+'\" style=\"text-decoration:line-through\">'+valueOfElement['fields']['task']+'</div></div>');		
+							}
+							else{
+								$('.modal-body').append('<div class=\"row\"><div class=\"col-md-12 col-sm-12\"><input type="checkbox" id="'+valueOfElement['pk']+'" class="complete-task" ><span class=\"task-desc\" id=\"todo'+valueOfElement['pk']+'\">'+valueOfElement['fields']['task']+'</div></div>');			
+							}
+						}	
 					});
-					$('.modal').modal('show');
+					if(!(($(".modal").data('bs.modal') || {})._isShown)){
+						$('.modal').modal('show');
+					}
+					// $('.modal').modal('show');
+					
 				}
 			});
 			
+		}
+	});
+	$('.modal-body').on('change','.complete-task',function(){
+		var self=this;
+		id=$(this).attr('id');
+		if(this.checked){
+			$.ajax({
+				type: "POST",
+				url: "complete",
+				data: {
+					'id':id,
+					'status':1,
+					'csrfmiddlewaretoken': '{{ csrf_token }}'
+				},
+				success: function (response) {
+					$(self).parent().children('.task-desc').css('text-decoration','line-through');	
+				}
+			});
+		}else{
+			$.ajax({
+				type: "POST",
+				url: "complete",
+				data: {
+					'id':id,
+					'status':0,					
+					'csrfmiddlewaretoken': '{{ csrf_token }}'
+				},
+				success: function (response) {
+					$(self).parent().children('.task-desc').css('text-decoration','none');	
+				}
+			});
 		}
 	});
 	</script>

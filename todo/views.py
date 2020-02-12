@@ -48,7 +48,7 @@ def completeTask(request):
         return HttpResponse("success")
 
 def fetchtodo(request):
-    tasks=Task.objects.filter(headtask=request.POST['id'])
+    tasks=Task.objects.filter(headtask=request.POST['id']).order_by('-created_on')
     # return HttpResponse(dict(tasks),content_type='application/json')
     task_list = serializers.serialize('json', tasks)
     return HttpResponse(task_list, content_type="text/json-comment-filtered")

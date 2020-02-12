@@ -19,7 +19,7 @@ body,html{
     color:#346fef;
     font-weight: bold;
 }
-.task-container .row{
+.task-container .row,.modal-body .row{
     padding:1em 1.5em;
     border-bottom: 1px solid #E8E8E8;
 }
@@ -57,4 +57,8 @@ input{
 }
 .modal-btns{
     text-align: right;
+}
+.modal-footer{
+    border-top: none;
+    padding-top: 0rem;
 }
