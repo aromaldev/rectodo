@@ -24,4 +24,6 @@ urlpatterns = [
     path('addtask',views.addTask,name='addtask'),
     path('complete',views.completeTask,name='complete'),
     path('fetchtodo',views.fetchtodo,name='fetchtodo'),
+    path('signup',views.signup,name='signup'),
+    path('adduser',views.addUser,name='adduser'),
 ]

@@ -31,9 +31,7 @@ def addTask(request):
     if(request.method=="POST"):
         newtask=Task(task=request.POST['task'],userId=User.objects.get(id=request.session['id']),headtask=request.POST['head'],tasktype=request.POST['tasktype'])
         newtask.save()
-        return HttpResponse(newtask.id) 
-
-    
+        return HttpResponse(newtask.id)    
 
 def logout(request):
     del request.session['name']
@@ -52,3 +50,13 @@ def fetchtodo(request):
     # return HttpResponse(dict(tasks),content_type='application/json')
     task_list = serializers.serialize('json', tasks)
     return HttpResponse(task_list, content_type="text/json-comment-filtered")
+
+def signup(request):
+    return render(request,'todo/signup.html')
+
+def addUser(request):
+    newUser=User(username=request.POST['username'],password=request.POST['password'])
+    newUser.save()
+    request.session['name'] = newUser.username
+    request.session['id'] = newUser.id
+    return redirect(reverse('todo:login'))
