@@ -9,7 +9,7 @@
 <!--===============================================================================================-->	
 	<link rel="icon" type="image/png" href="{% static 'todo/images/icons/favicon.ico' %}"/>
 <!--===============================================================================================-->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" href="{% static 'todo/vendor/bootstrap/css/bootstrap.min.css' %}" crossorigin="anonymous">
 <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="{% static 'todo/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">	
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
@@ -26,11 +26,11 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       	<ul class="navbar-nav ml-auto">
+			<li class="nav-item">
+				<a class="nav-link" href="#">{{ username }}</a>
+		  	</li>
         	<li class="nav-item active">
           		<a class="nav-link" href="{% url 'todo:logout' %}">Logout</a>
-        	</li>
-       		<li class="nav-item">
-          		<a class="nav-link" href="#">{{ username }}</a>
         	</li>
       	</ul>
     </div>
@@ -81,9 +81,9 @@
 			<div class="modal-header">
 				<nav aria-label="breadcrumb">
 					<ol class="breadcrumb">
-					  <li class="breadcrumb-item"><a href="#">Home</a></li>
+					  <!-- <li class="breadcrumb-item"><a href="#">Home</a></li>
 					  <li class="breadcrumb-item"><a href="#">Library</a></li>
-					  <li class="breadcrumb-item active" aria-current="page">Data</li>
+					  <li class="breadcrumb-item active" aria-current="page">Data</li> -->
 					</ol>
 				</nav>
 		 		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -113,8 +113,8 @@
 
 	<script>
 	add_task=false;
-	head_task=[];
-	head_task_id=[];
+	head_task=['main'];
+	head_task_id=[0];
 	$('.add_task').on('click',function(event){
 		event.preventDefault();
 		alert("hello");
@@ -128,6 +128,24 @@
 			$('.task-in-row').remove();
 		}
 	});
+	$('#modal-task-btn').click(function(){
+		if (!add_task){
+			modal_add_task=true;
+			$('.modal-body').prepend('<div class=\"row task-in-row\"><div class=\"col-md-12 col-sm-12\"><img src=\"{% static "todo/images/icons/plus.png" %}\" class=\"add-ico\"/><input type=\"text\" class=\"input modal-task-in\" placeholder=\"Enter your task\" data-type=\"task\"></div></div>');		
+		}else{
+			modal_add_task=false;
+			$('.task-in-row').remove();
+		}
+	});
+	$('#modal-todo-btn').click(function(){
+		if (!add_task){
+			modal_add_task=true;
+			$('.modal-body').prepend('<div class=\"row task-in-row\"><div class=\"col-md-12 col-sm-12\"><img src=\"{% static "todo/images/icons/plus.png" %}\" class=\"add-ico\"/><input type=\"text\" class=\"input modal-task-in\" placeholder=\"Enter your todo\" data-type=\"todo\"></div></div>');		
+		}else{
+			modal_add_task=false;
+			$('.task-in-row').remove();
+		}
+	});
 	$(document).on('blur','.task-in',function(){
 		if($('.task-in').val().length>0){
 			task=$('.task-in').val();
@@ -135,7 +153,7 @@
 			$.ajax({
 				type: "POST",
 				url: "addtask",
-				data: {'task':task,'csrfmiddlewaretoken': '{{ csrf_token }}','head':head_task,'tasktype':'task'},
+				data: {'task':task,'csrfmiddlewaretoken': '{{ csrf_token }}','head':head_task_id[0],'tasktype':'task'},
 				success: function (response) {
 					add_task=false;
 					$('.task-in-row').remove();
@@ -147,6 +165,30 @@
 			$('.task-in-row').remove();
 		}
 	});
+	$(document).on('blur','.modal-task-in',function(){
+		if($(this).val().length>0){
+			task=$(this).val();
+			ttype=$(this).data('type');			
+			$.ajax({
+				type: "POST",
+				url: "addtask",
+				data: {'task':task,'csrfmiddlewaretoken': '{{ csrf_token }}','head':head_task_id[0],'tasktype':ttype},
+				success: function (response) {
+					modal_add_task=false;
+					$('.modal-body .task-in-row').remove();
+					if(ttype=="task"){
+						$('.modal-body').prepend('<div class=\"row\"><div class=\"col-md-12 col-sm-12\"><input type="checkbox" id="'+response+'" class="complete-task" ><span class=\"task-desc\" id=\"task'+response+'\">'+task+'</span></div></div>');	
+					}
+					else{
+						$('.modal-body').prepend('<div class=\"row\"><div class=\"col-md-12 col-sm-12\"><input type="checkbox" id="'+response+'" class="complete-task" ><span class=\"task-desc\" id=\"todo'+response+'\">'+task+'</span><span class="badge badge-primary">todo</span></div></div>');		
+					}
+				}
+			});
+		}else{
+			add_task=false;
+			$('.modal-body .task-in-row').remove();
+		}
+	});
 	$(document).on('keydown','.task-in',function(e){
   		if(e.keyCode == 13){
 			if($('.task-in').val().length>0){
@@ -154,6 +196,16 @@
 			}else{
 				add_task=false;
 				$('.task-in-row').remove();
+			}
+		}
+	});
+	$(document).on('keydown','.modal-task-in',function(e){
+  		if(e.keyCode == 13){
+			if($('.modal-task-in').val().length>0){
+				$(this).blur();
+			}else{
+				modal_add_task=false;
+				$('.modal_body .task-in-row').remove();
 			}
 		}
 	});
@@ -215,7 +267,7 @@
 							$.ajax({
 								type: "POST",
 								url: "addtask",
-								data: {'task':name,'csrfmiddlewaretoken': '{{ csrf_token }}','head':head_task,'tasktype':'todo'},
+								data: {'task':name,'csrfmiddlewaretoken': '{{ csrf_token }}','head':head_task_id[0],'tasktype':'todo'},
 								success: function (response) {
 									// $(this).remove();
 									
@@ -244,9 +296,15 @@
 		// alert(ttype.slice(0,4));
 		if(ttype.slice(0,4)=='todo'){
 			tid=ttype.slice(4,ttype.length);
-			head_task_id.unshift(tid);
-			head_task.unshift(tname);
-			console.log(tid);
+			index_todo=head_task_id.indexOf(tid)
+			if(index_todo==-1){
+				head_task_id.unshift(tid);
+				head_task.unshift(tname);
+			}else{
+				head_task=head_task.slice(index_todo,);
+				head_task_id=head_task_id.slice(index_todo,);
+			}
+			console.log(head_task);
 			$.ajax({
 				type: "POST",
 				url: "fetchtodo",
@@ -254,6 +312,11 @@
 				dataType : "JSON",
 				success: function (response) {
 					$('.modal-body').html('');
+					$('.breadcrumb').html('');
+					for (let i = head_task.length - 2; i>=1 ; i--) {
+    					$('.breadcrumb').append('<li class="breadcrumb-item"><a href="#" class="task-desc" id="todo'+head_task_id[i]+'">'+head_task[i]+'</a></li>');
+					}
+					$('.breadcrumb').append('<li class="breadcrumb-item active" aria-current="page">'+head_task[0]+'</li>');
 					$.each(response, function (indexInArray, valueOfElement) { 
 						if(valueOfElement['fields']['tasktype']=='todo'){
 							if(valueOfElement['fields']['completed']==1){
@@ -311,6 +374,10 @@
 				}
 			});
 		}
+	});
+	$('#exampleModalCenter').on('hidden.bs.modal', function (e) {
+		head_task=['main'];
+		head_task_id=[0];
 	});
 	</script>
 	
